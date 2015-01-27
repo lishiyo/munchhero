@@ -1,12 +1,12 @@
 {
-	"name": "meanjs",
-	"description": "Full-Stack JavaScript with MongoDB, Express, AngularJS, and Node.js.",
+	"name": "munchhero",
+	"description": "Built off of Mean.js",
 	"version": "0.3.3",
 	"private": false,
-	"author": "https://github.com/meanjs/mean/graphs/contributors",
+	"author": "https://github.com/lishiyo",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/meanjs/mean.git"
+		"url": "https://github.com/lishiyo/munchhero_mean"
 	},
 	"engines": {
 		"node": ">=0.10.28",
@@ -45,7 +45,9 @@
 		"glob": "~4.0.5",
 		"async": "~0.9.0",
 		"nodemailer": "~1.3.0",
-		"chalk": "~0.5"
+		"chalk": "~0.5",
+		"async": "*",
+		"ejs": "*"
 	},
 	"devDependencies": {
 		"supertest": "~0.14.0",
