@@ -1,3 +1,13 @@
 <section data-ng-controller="HomeController">
 	<h1>MunchHero</h1>
+	
+	<form class="search" method="GET" action="/searchFood">
+		<input class="searchFont" name="query" placeholder="Search Food Pics" />
+		<input type="hidden" name="lat" value="" id="lat" />
+		<input type="hidden" name="lng" value="" id="lng" />
+	</form>
+	
+	<div id="map-canvas"></div>	
+	
 </section>
+

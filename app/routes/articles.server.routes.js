@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 var users = require('../../app/controllers/users.server.controller'),
-	articles = require('../../app/controllers/articles.server.controller');
+		articles = require('../../app/controllers/articles.server.controller');
 
 module.exports = function(app) {
 	// Article Routes
