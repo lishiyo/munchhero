@@ -72,16 +72,15 @@ exports.searchFood = function(req, res) {
     }
 		var results = parseResults(req, parsedData);
 		var resultList = results[0];
-		var venueIds = results[1]; // array of objects
+		var venueIds = results[1]; // array of vId + vData
 		
 		// makes call to getAllFood()
 		getFoodPics(venueIds, function(err, photoData){
-			console.log("getFoodPics called with photoData\n", photoData);	
 			
 			var allVenues = {
 				venuesArr: resultList,
-				photosArr: photoData,
-				countPhotos: photosArr.length
+				photosArr: photoData, // vData + photo
+				countPhotos: photoData.length
 			}
 			// return json of venues and photos
 			res.json(allVenues);

@@ -5,8 +5,11 @@
 	<h1>Great pick!</h1>
 	
 	<div id="photos-cont">
-		<div ng-repeat="photo in photos">
-			<img src="{{ photo.url }}">
+		<div class="photo-box" ng-repeat="photo in photos">
+			<div class="photo-box">
+				<img src="{{ photo.url }}">
+				{{photo.vName}} {{photo.vRating}}
+			</div>
 		</div>
 		<div class="animate-repeat" ng-if="photos.length == 0">
       <strong>No results found...</strong>

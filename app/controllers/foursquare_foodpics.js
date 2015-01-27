@@ -33,7 +33,14 @@ var getOneFood = function(venue, cb){
 			for (var i = 0; i < photoData.length ; i++) {
 				var obj = {
 					url: photoData[i]['prefix']+"300x300"+photoData[i]['suffix'],
-					venueId: venue.vId
+					vId: venue.vId,
+					vName: venue.vData.name,
+					vAddress: venue.vData.address,
+					vStats: venue.vData.stats,
+					vPrice: venue.vData.price,
+					vRating: venue.vData.rating,
+					vUrl: venue.vData.url,
+					vOpen: venue.vData.open
 				}						
 				if (obj !== undefined) {
 					photoObjs.push(obj);
@@ -57,7 +64,6 @@ var getAllFood = function(venueIds, callback) {
 		if( err ) {
       console.log('getAllFood error', err);
     } else {
-      console.log("finished async.each\n", photoObjs.length);		
 			callback(null, photoObjs);
     }			
 	});

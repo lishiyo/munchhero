@@ -1,11 +1,24 @@
-angular.module('foursquare').controller('MainSearchController', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache', 
-	function($scope, $stateParams, $location, Authentication, $http, $templateCache) {
+angular.module('foursquare')
+
+.directive('noScroll', function($document) {
+	return {
+		restrict: 'A',
+		link: function($scope, $element, $attr) {
+
+			$document.on('touchmove', function(e) {
+				e.preventDefault();
+			});
+		}
+	}
+})
+
+.controller('MainSearchController', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache',
+	function($scope, $stateParams, $location, Authentication, $http, $templateCache, TDCardDelegate) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 		
 		var url = $location.url();
 		
-
 		var getFoodPics = function() {
 			$http.get(url).
 				success(function(data, status, headers, config) {					
