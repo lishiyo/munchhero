@@ -1,18 +1,42 @@
-angular.module('foursquare').controller('MainSearchController', ['$scope', 'Authentication',
-	function($scope, Authentication) {
+angular.module('foursquare').controller('MainSearchController', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache', 
+	function($scope, $stateParams, $location, Authentication, $http, $templateCache) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 		
-		console.log("mainsearchcontroller");
+		var url = $location.url();
 		
-// 		var loadScript = function() {
-// 			var script = document.createElement('script');
-// 			script.type = 'text/javascript';
-// 			script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&' + 'callback=setUpMap';
-// 			document.body.appendChild(script);
-// 		}
 
-// 		loadScript();
+		var getFoodPics = function() {
+			$http.get(url).
+				success(function(data, status, headers, config) {					
+					$scope.venues = data.venuesArr;
+					$scope.photos = data.photosArr;
+				
+					$scope.latLng = [];
+					$scope.venues.forEach(function(venue){
+						$scope.latLng.push({
+							lat: Number(venue.location.lat),
+							lng: Number(venue.location.lng),
+							name: venue.name,
+							rating: venue.rating,
+							price: venue.price
+						});
+					}, this);
+				
+				window.latLng = $scope.latLng;
+				
+				console.log("success latLng", $scope.latLng);
+				}).
+				error(function(data, status, headers, config) {
+					console.log("error", data);
+				});
+		};
+		
+		$scope.loadAll = function(){
+			getFoodPics();
+		};
+		
+		
 	}																									 
 	
 ]);

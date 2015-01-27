@@ -1,27 +1,39 @@
 .content {
 	margin-top: 50px;
 }
+
 .undecorated-link:hover {
 	text-decoration: none;
 }
+
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
 }
+
 .ng-invalid.ng-dirty {
 	border-color: #FA787E;
 }
+
 .ng-valid.ng-dirty {
 	border-color: #78FA89;
 }
+
 .browsehappy.jumbotron.hide,
-body.ng-cloak
-{
+body.ng-cloak {
 	display: block;
 }
 
-#food-all img {
+/** HEADER **/
+.navbar nav li {
+	margin: 0 10px;
+}
+
+/** 4SQUARE **/
+#photos-cont img {
 	max-width: 300px;
 	max-height: 300px;
+	float:left;
+	margin: 5px;
 }
 
 .venueName{

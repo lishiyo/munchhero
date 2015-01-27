@@ -9,12 +9,11 @@ var foursquareClientSecret = process.env.FS_CLIENT_SECRET || secrets.foursquare.
 var photoObjs = [];
 
 // get food pics for one venue
-// venue = [{ vId: 'awef', vData: { id: "awe", address: "awe", }}]
-var getOneFood = function(venue, cb){
+var getOneFood = function(vId, cb){
 	var options = {
 		host: 'api.foursquare.com',
 		port: 443,
-		path: '/v2/venues/' + venue.vId + "/photos?limit=2&v=20150125&client_id=" + foursquareClientId + '&client_secret=' + foursquareClientSecret,
+		path: '/v2/venues/' + vId + "/photos?limit=2&v=20150125&client_id=" + foursquareClientId + '&client_secret=' + foursquareClientSecret,
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
@@ -33,7 +32,7 @@ var getOneFood = function(venue, cb){
 			for (var i = 0; i < photoData.length ; i++) {
 				var obj = {
 					url: photoData[i]['prefix']+"300x300"+photoData[i]['suffix'],
-					venueId: venue.vId
+					venueId: vId
 				}						
 				if (obj !== undefined) {
 					photoObjs.push(obj);
@@ -50,7 +49,6 @@ var getOneFood = function(venue, cb){
 	
 	req.end();
 }
-
 
 var getAllFood = function(venueIds, callback) {
 	async.each(venueIds, getOneFood, function(err) {		

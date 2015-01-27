@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var setUpMap = function(){
 	var getLocation = function() {
@@ -77,18 +77,3 @@ var setUpMap = function(){
 
 	getLocation();
 }
-
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-	function($scope, Authentication) {
-		// This provides Authentication context.
-		$scope.authentication = Authentication;
-		
-		$scope.loadScript = function(){
-			var script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&' + 'callback=setUpMap';
-			document.body.appendChild(script);
-		};
-	}																									 
-	
-]);

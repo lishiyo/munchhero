@@ -14,8 +14,6 @@ module.exports = function(query, callback) {
 	var options = {
 		host: 'api.foursquare.com',
 		port: 443,
-// 		path: '/v2/venues/explore?client_id=' + foursquareClientId + '&client_secret=' + foursquareClientSecret + '&v=20140125&ll=40.72078,-74.001119&query=' + query,
-
 		path: '/v2/venues/explore?client_id=' + foursquareClientId + '&client_secret=' + foursquareClientSecret + '&v=20150125&ll=' + lat + "," + lng + '&query=' + query.query,
 		method: 'GET',
 		headers: {
@@ -33,7 +31,7 @@ module.exports = function(query, callback) {
 			var parsedData = JSON.parse(stringBody);
 			// API call
 			console.log(options.host + options.path);
-
+			// callback to parseResults
 			callback(null, parsedData);
 		});
 	});

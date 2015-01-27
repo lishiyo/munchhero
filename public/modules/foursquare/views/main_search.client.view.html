@@ -1,7 +1,38 @@
-<section data-ng-controller="MainSearchController">
+
+<div ng-app="foursquare">
+	
+<section data-ng-controller="MainSearchController" data-ng-init="loadAll()">
 	<h1>Great pick!</h1>
 	
-	<div id="map-canvas"></div>	
+	<div id="photos-cont">
+		<div ng-repeat="photo in photos">
+			<img src="{{ photo.url }}">
+		</div>
+		<div class="animate-repeat" ng-if="photos.length == 0">
+      <strong>No results found...</strong>
+    </div>
+	</div>
+	
+	<input type="search" ng-model="q" placeholder="filter venues..." />
+	<div id="venues-cont">
+		<div class="animate-repeat venue venueInfo" ng-repeat="venue in venues | filter:q">
+			<div class="venueInfo">				
+				<div class="venueName">
+					<a ng-if="venue.url !== undefined" href="{{venue.url}}">{{venue.name}}</a>
+					<span ng-if="venue.url == undefined">{{venue.name}}</span>
+				</div>
+				<div class="address">
+					{{venue.address.join(" ")}} 
+				</div>
+			</div>
+    </div>
+		
+    <div class="animate-repeat" ng-if="venues.length == 0">
+      <strong>No results found...</strong>
+    </div>
+	</div>
 	
 </section>
 
+
+</div>

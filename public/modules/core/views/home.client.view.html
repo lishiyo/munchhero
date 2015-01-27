@@ -1,8 +1,8 @@
-<section data-ng-controller="HomeController">
+<section data-ng-controller="HomeController" data-ng-init="loadScript()">
 	<h1>MunchHero</h1>
 	
 	<form class="search" method="GET" action="/searchFood">
-		<input class="searchFont" name="query" placeholder="Search Food Pics" />
+		<input class="searchFont" name="query" placeholder="search food near me" />
 		<input type="hidden" name="lat" value="" id="lat" />
 		<input type="hidden" name="lng" value="" id="lng" />
 	</form>

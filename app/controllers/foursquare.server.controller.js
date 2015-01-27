@@ -4,9 +4,9 @@ var http     			= require("http"),
 async 						= require('async'),
 search 			    	= require("./foursquare_search"),
 getFoodPics				= require("./foursquare_foodpics");
+// getVenueFood			= require("./foursquare_venuefood");
 
 /** Main Search **/
-
 
 function parseResults (req, parsedData) {
 	
@@ -15,7 +15,7 @@ function parseResults (req, parsedData) {
   var result = [];
 	var venueIds = [];
 	
-  for (i = 0; i < items.length; i++) {
+  for (var i = 0; i < items.length; i++) {
     var venue = items[i].venue
     var id = venue.id;
     var name = venue.name;
@@ -33,8 +33,8 @@ function parseResults (req, parsedData) {
     var hours = venue.hours && venue.hours.isOpen; 
     var url = venue.url;
 
-    result.push({
-      id: id,
+		var venueData = {
+			id: id,
       name: name,
       location: location,
 			address: address,
@@ -45,9 +45,15 @@ function parseResults (req, parsedData) {
       rating: rating,
       open: hours,
       url: url
-    });
+		}
 		
-		venueIds.push(id);
+    result.push(venueData);
+		
+		venueIds.push({
+			vId: id,
+			vData: venueData
+		});
+		
   }
   return [result, venueIds];
 };
@@ -65,18 +71,19 @@ exports.searchFood = function(req, res) {
       return console.error('There was an error: ' + err.message);
     }
 		var results = parseResults(req, parsedData);
-		var result_list = results[0];
-		var venueIds = results[1];
+		var resultList = results[0];
+		var venueIds = results[1]; // array of objects
 		
-		// makes call to getAllFood
+		// makes call to getAllFood()
 		getFoodPics(venueIds, function(err, photoData){
 			console.log("getFoodPics called with photoData\n", photoData);	
 			
 			var allVenues = {
-				result_list: result_list,
-				photoObjs: photoData
+				venuesArr: resultList,
+				photosArr: photoData,
+				countPhotos: photosArr.length
 			}
-			
+			// return json of venues and photos
 			res.json(allVenues);
 		}); 
 		

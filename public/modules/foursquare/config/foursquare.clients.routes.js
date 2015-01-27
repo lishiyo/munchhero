@@ -1,6 +1,5 @@
 'use strict';
 
-// Setting up route
 angular.module('foursquare').config(['$stateProvider',
 	function($stateProvider) {
 		// search routing
