@@ -53,7 +53,7 @@ module.exports = {
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
-				'public/lib/angular-sanitize/angular-sanitize.min.js',
+				'public/lib/angular-sanitize/angular-sanitize.js',
 				'public/lib/ionic/js/ionic.bundle.min.js',
 				'public/lib/collide/collide.js',
 				'public/lib/ionic-ion-tinder-cards/ionic.tdcards.js',
