@@ -1,8 +1,26 @@
-
-<div ng-app="foursquare">
+<body ng-app="foursquare">
 	
 <section data-ng-controller="MainSearchController" data-ng-init="loadAll()">
 	<h1>Great pick!</h1>
+	
+	<section class="cards" no-scroll>
+	<ion-pane ng-controller="CardsCtrl">
+		<ion-header-bar class="bar-default">
+			<h1 class="title">TD Cards</h1>
+		</ion-header-bar>
+
+		<td-cards>
+			<td-card ng-repeat="card in cards" on-destroy="cardDestroyed($index)" on-swipe-left="cardSwipedLeft($index)" on-swipe-right="cardSwipedRight($index)" on-partial-swipe="cardPartialSwipe(amt)" class="card-{{$index}}">
+				<div class="image" ng-controller="CardCtrl">
+					<div class="no-text">NOPE</div>
+					<img ng-src="{{card.image}}">
+					<div class="yes-text">LIKE</div>
+				</div>
+			</td-card>
+		</td-cards>
+	</ion-pane>
+</section>
+	
 	
 	<div id="photos-cont">
 		<div class="photo-box" ng-repeat="photo in photos">
@@ -38,4 +56,4 @@
 </section>
 
 
-</div>
+</body>
