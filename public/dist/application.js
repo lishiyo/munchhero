@@ -4,7 +4,7 @@
 var ApplicationConfiguration = (function() {
 	// Init module configuration options
 	var applicationModuleName = 'mean';
-	var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ui.router', 'ui.bootstrap', 'ui.utils'];
+	var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ui.router', 'ui.utils', 'ngSanitize', 'ionic', 'ionic.contrib.ui.tinderCards'];
 
 	// Add a new vertical module
 	var registerModule = function(moduleName, dependencies) {
@@ -33,6 +33,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 	}
 ]);
 
+
 //Then define the init function for starting up the application
 angular.element(document).ready(function() {
 	//Fixing facebook bug with redirect
@@ -43,15 +44,22 @@ angular.element(document).ready(function() {
 });
 'use strict';
 
-// Use Applicaion configuration module to register a new module
+// Use Application configuration module to register a new module
 ApplicationConfiguration.registerModule('articles');
+
 'use strict';
 
-// Use Applicaion configuration module to register a new module
+// Use Application configuration module to register a new module
 ApplicationConfiguration.registerModule('core');
+
 'use strict';
 
-// Use Applicaion configuration module to register a new module
+// Use Application configuration module to register a new module
+ApplicationConfiguration.registerModule('foursquare');
+
+'use strict';
+
+// Use Application configuration module to register a new module
 ApplicationConfiguration.registerModule('users');
 'use strict';
 
@@ -62,6 +70,11 @@ angular.module('articles').run(['Menus',
 		Menus.addMenuItem('topbar', 'Articles', 'articles', 'dropdown', '/articles(/create)?');
 		Menus.addSubMenuItem('topbar', 'articles', 'List Articles', 'articles');
 		Menus.addSubMenuItem('topbar', 'articles', 'New Article', 'articles/create');
+		
+		// Set photos
+		Menus.addMenuItem('topbar', 'Map Search', 'articles', 'dropdown', '/articles(/create)?');
+		Menus.addSubMenuItem('topbar', 'articles', 'Search Places', 'articles');
+		Menus.addSubMenuItem('topbar', 'articles', 'Swipe Food', 'articles/create');
 	}
 ]);
 'use strict';
@@ -195,15 +208,205 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		});
 	}
 ]);
-'use strict';
+'use strict'
 
+var setUpMap = function(){
+	var getLocation = function() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(showPosition);
+		} else { 
+				console.log("Geolocation is not supported by this browser.");
+		}
+	}
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-	function($scope, Authentication) {
+	var showPosition = function(position) {
+		var theLatLng = new google.maps.LatLng(Number(position.coords.latitude), Number(position.coords.longitude)); 
+		
+
+		document.getElementById('lat').setAttribute("value", position.coords.latitude);
+		document.getElementById('lng').setAttribute("value", position.coords.longitude);
+		
+		var mapOptions = {
+			zoom: 15,
+			center: theLatLng
+		};
+
+		var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+		var centerMarker = new google.maps.Marker({
+			position: theLatLng,
+			map: map,
+			title: "Center",
+			icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+		});
+
+		var infoWindows = [];
+		var markers = [];
+		var latLngBounds = new google.maps.LatLngBounds();
+
+		if (latLng !== undefined && latLng.length > 0) {
+			latLng.forEach(function(item){
+				infoWindows.push(new google.maps.InfoWindow({
+					content: "<div>" + item.name + "</div>" + "<div>" + "Rating: " + item.rating + "</div>" +
+						"<div>" + "Price Level: " + item.price + "</div>"
+				}));
+
+				var latLng = new google.maps.LatLng(item.lat, item.lng);
+
+				markers.push(new google.maps.Marker({
+					position: latLng,
+					map: map,
+					title: item.name,
+					icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+				}));
+				
+				latLngBounds.extend(latLng);
+			});
+		}
+
+		map.setCenter(latLngBounds.getCenter());
+		map.fitBounds(latLngBounds);
+
+		//console.log(infoWindows)
+		for (var i = 0; i < markers.length; i++) {
+			google.maps.event.addListener(markers[i], 'click', function(innerKey) {
+				var clicks = 0;
+				return function() {
+					// console.log(infoWindows[i]);
+					clicks++;
+					infoWindows[innerKey].open(map, markers[innerKey]);
+				}
+			}(i));
+		}
+	}
+
+	getLocation();
+}
+
+angular.module('core')
+
+.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+ 
+                event.preventDefault();
+            }
+        });
+    };
+})
+
+.controller('HomeController', ['$scope', 'Authentication', '$location', 
+	function($scope, Authentication, $location) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
-	}
+		
+		$scope.loadScript = function(){
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&' + 'callback=setUpMap';
+			document.body.appendChild(script);
+		};
+		
+		// http://field-neutral.codio.io:3000/#!/searchFood?query=pizza&lat=40.811597299999995&lng=-73.9589499
+		$scope.getSearch = function(){			
+			var lat = angular.element( document.querySelector( '#lat' ) ).val();
+			var lng = angular.element( document.querySelector( '#lng' ) ).val();
+			
+			var url = '/searchFood?query=' + this.query + "&lat=" + lat + "&lng=" + lng;
+			console.log("getSearch", url);
+			
+			$location.path("/searchFood").search({
+				query: this.query,
+				lat: lat,
+				lng: lng
+			});
+			
+		}
+	}																									 	
 ]);
+'use strict';
+
+var setUpMap = function(){
+	var getLocation = function() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(showPosition);
+		} else { 
+				console.log("Geolocation is not supported by this browser.");
+		}
+	}
+
+	var showPosition = function(position) {
+		var theLatLng = new google.maps.LatLng(Number(position.coords.latitude), Number(position.coords.longitude)); 
+		console.log("showposition", theLatLng);
+
+		document.getElementById('lat').setAttribute("value", position.coords.latitude);
+		document.getElementById('lng').setAttribute("value", position.coords.longitude);
+
+		var mapOptions = {
+			zoom: 15,
+			center: theLatLng
+		};
+
+		var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+		var centerMarker = new google.maps.Marker({
+			position: theLatLng,
+			map: map,
+			title: "Center",
+			icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+		});
+
+		var infoWindows = [];
+		var markers = [];
+		var latLngBounds = new google.maps.LatLngBounds();
+
+// 		lat: Number(venue.location.lat),
+// 		lng: Number(venue.location.lng),
+// 		name: venue.name,
+// 		rating: venue.rating,
+// 		price: venue.price
+		if (latLng !== undefined && latLng.length > 0) {
+			latLng.forEach(function(item){
+				infoWindows.push(new google.maps.InfoWindow({
+					content: "<div>" + item.name + "</div>" + "<div>" + "Rating: " + item.rating + "</div>" +
+						"<div>" + "Price Level: " + item.price + "</div>"
+				}));
+
+				var latLng = new google.maps.LatLng(item.lat, item.lng);
+
+				markers.push(new google.maps.Marker({
+					position: latLng,
+					map: map,
+					title: item.name,
+					icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+				}));
+				
+				latLngBounds.extend(latLng);
+			});
+		}
+
+		map.setCenter(latLngBounds.getCenter());
+		map.fitBounds(latLngBounds);
+
+		//console.log(infoWindows)
+		for (var i = 0; i < markers.length; i++) {
+			google.maps.event.addListener(markers[i], 'click', function(innerKey) {
+				var clicks = 0;
+				return function() {
+					// console.log(infoWindows[i]);
+					clicks++;
+					infoWindows[innerKey].open(map, markers[innerKey]);
+				}
+			}(i));
+		}
+	}
+
+	getLocation();
+}
 'use strict';
 
 //Menu service used for managing  menus
@@ -370,6 +573,142 @@ angular.module('core').service('Menus', [
 		this.addMenu('topbar');
 	}
 ]);
+'use strict';
+
+angular.module('foursquare', ['ionic', 'ionic.contrib.ui.tinderCards'])
+	.config(['$stateProvider',
+		function($stateProvider) {
+			// search routing
+			$stateProvider.
+			state('mainSearch', {
+				url: '/searchFood',
+				templateUrl: 'modules/foursquare/views/main_search.client.view.html'
+			});
+		}
+]);
+angular.module('foursquare')
+
+.directive('noScroll', ["$document", function($document) {
+	return {
+		restrict: 'A',
+		link: function($scope, $element, $attr) {
+			$document.on('touchmove', function(e) {
+				e.preventDefault();
+			});
+		}
+	}
+}])
+
+.controller('MainSearchController', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache',
+	function($scope, $stateParams, $location, Authentication, $http, $templateCache, TDCardDelegate) {
+		// This provides Authentication context.
+		$scope.authentication = Authentication;
+		
+		var url = $location.url();
+		
+		var getFoodPics = function() {
+			$http.get(url).
+				success(function(data, status, headers, config) {					
+					$scope.venues = data.venuesArr;
+					$scope.photos = data.photosArr;
+				
+					$scope.latLng = [];
+					$scope.venues.forEach(function(venue){
+						$scope.latLng.push({
+							lat: Number(venue.location.lat),
+							lng: Number(venue.location.lng),
+							name: venue.name,
+							rating: venue.rating,
+							price: venue.price
+						});
+					}, this);
+				
+					$scope.createCards();
+				
+				}).error(function(data, status, headers, config) {
+					console.log("error", data);
+				});
+		};
+		
+		$scope.loadAll = function(){
+			getFoodPics();
+		};
+		
+		// upon click, show card data
+		$scope.showData = function(card) {
+			console.log("clicked showdata", card, card.vName);
+			
+			var dataBox = angular.element( document.querySelector( 'div.card-data' ) );
+			
+			dataBox.toggleClass('hidden');     
+		};
+		
+		$scope.createCards = function(){
+			$scope.cardTypes = $scope.photos;
+			$scope.cards = Array.prototype.slice.call($scope.cardTypes, 0);
+		};
+	
+		$scope.cardDestroyed = function(index) {
+			$scope.cards.splice(index, 1);
+		};
+
+		$scope.addCard = function() {
+			var newCard = $scope.cardTypes[Math.floor(Math.random() * $scope.cardTypes.length)];
+			newCard.id = Math.random();
+			$scope.cards.push(angular.extend({}, newCard));
+		}
+		
+	}																									 
+	
+])
+
+// .controller('CardsCtrl', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache', 
+// 	function($scope, TDCardDelegate) {
+	
+// 		var cardTypes = [
+// 			{ image: 'https://pbs.twimg.com/profile_images/546942133496995840/k7JAxvgq.jpeg' },
+// 			{ image: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png' },
+// 			{ image: 'https://pbs.twimg.com/profile_images/491995398135767040/ie2Z_V6e.jpeg' },
+// 		];
+
+// 		$scope.createCards = function(){
+// 			console.log("cardsCtrl", $scope.photos);
+
+// 			$scope.cardTypes = $scope.photos.map(function(obj){
+// 				return { image: obj.url }
+// 			});
+
+// 			console.log("cardTypes in cardsCtrl", $scope.cardTypes);
+// 		};
+		
+		
+// 		$scope.cards = Array.prototype.slice.call($scope.cardTypes, 0);
+
+// 		$scope.cardDestroyed = function(index) {
+// 			$scope.cards.splice(index, 1);
+// 		};
+
+// 		$scope.addCard = function() {
+// 			var newCard = $scope.cardTypes[Math.floor(Math.random() * $scope.cardTypes.length)];
+// 			newCard.id = Math.random();
+// 			$scope.cards.push(angular.extend({}, newCard));
+// 		}
+// }])
+
+.controller('CardCtrl', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache', 
+	function($scope, TDCardDelegate) {
+			
+		$scope.cardSwipedLeft = function(index) {
+			console.log('LEFT SWIPE');
+			$scope.addCard();
+		};
+		$scope.cardSwipedRight = function(index) {
+			console.log('RIGHT SWIPE');
+			$scope.addCard();
+		};
+}]);
+
+
 'use strict';
 
 // Config HTTP Error Handling
