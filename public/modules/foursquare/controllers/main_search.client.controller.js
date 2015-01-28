@@ -35,11 +35,9 @@ angular.module('foursquare')
 						});
 					}, this);
 				
-				window.latLng = $scope.latLng;
+					$scope.createCards();
 				
-				console.log("success latLng", $scope.latLng);
-				}).
-				error(function(data, status, headers, config) {
+				}).error(function(data, status, headers, config) {
 					console.log("error", data);
 				});
 		};
@@ -48,38 +46,70 @@ angular.module('foursquare')
 			getFoodPics();
 		};
 		
-	}																									 
+		// upon click, show card data
+		$scope.showData = function(card) {
+			console.log("clicked showdata", card, card.vName);
+			
+			var dataBox = angular.element( document.querySelector( 'div.card-data' ) );
+			
+			dataBox.toggleClass('hidden');     
+		};
+		
+		$scope.createCards = function(){
+			$scope.cardTypes = $scope.photos;
+			$scope.cards = Array.prototype.slice.call($scope.cardTypes, 0);
+		};
 	
-])
-
-.controller('CardsCtrl', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache', 
-	function($scope, TDCardDelegate) {
-	
-		console.log('CARDS CTRL');
-
-		var cardTypes = [
-			{ image: 'https://pbs.twimg.com/profile_images/546942133496995840/k7JAxvgq.jpeg' },
-			{ image: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png' },
-			{ image: 'https://pbs.twimg.com/profile_images/491995398135767040/ie2Z_V6e.jpeg' },
-		];
-
-		$scope.cards = Array.prototype.slice.call(cardTypes, 0);
-
 		$scope.cardDestroyed = function(index) {
 			$scope.cards.splice(index, 1);
 		};
 
 		$scope.addCard = function() {
-			var newCard = cardTypes[Math.floor(Math.random() * cardTypes.length)];
+			var newCard = $scope.cardTypes[Math.floor(Math.random() * $scope.cardTypes.length)];
 			newCard.id = Math.random();
 			$scope.cards.push(angular.extend({}, newCard));
 		}
-}])
+		
+	}																									 
+	
+])
+
+// .controller('CardsCtrl', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache', 
+// 	function($scope, TDCardDelegate) {
+	
+// 		var cardTypes = [
+// 			{ image: 'https://pbs.twimg.com/profile_images/546942133496995840/k7JAxvgq.jpeg' },
+// 			{ image: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png' },
+// 			{ image: 'https://pbs.twimg.com/profile_images/491995398135767040/ie2Z_V6e.jpeg' },
+// 		];
+
+// 		$scope.createCards = function(){
+// 			console.log("cardsCtrl", $scope.photos);
+
+// 			$scope.cardTypes = $scope.photos.map(function(obj){
+// 				return { image: obj.url }
+// 			});
+
+// 			console.log("cardTypes in cardsCtrl", $scope.cardTypes);
+// 		};
+		
+		
+// 		$scope.cards = Array.prototype.slice.call($scope.cardTypes, 0);
+
+// 		$scope.cardDestroyed = function(index) {
+// 			$scope.cards.splice(index, 1);
+// 		};
+
+// 		$scope.addCard = function() {
+// 			var newCard = $scope.cardTypes[Math.floor(Math.random() * $scope.cardTypes.length)];
+// 			newCard.id = Math.random();
+// 			$scope.cards.push(angular.extend({}, newCard));
+// 		}
+// }])
 
 .controller('CardCtrl', ['$scope', '$stateParams', '$location', 'Authentication', '$http', '$templateCache', 
 	function($scope, TDCardDelegate) {
-		console.log("cardCtrl", TDCardDelegate);
-		
+			
 		$scope.cardSwipedLeft = function(index) {
 			console.log('LEFT SWIPE');
 			$scope.addCard();

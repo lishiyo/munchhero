@@ -8,6 +8,7 @@ getFoodPics				= require("./foursquare_foodpics");
 
 /** Main Search **/
 
+// callback for search()
 function parseResults (req, parsedData) {
 	
   //items is an array of venues
@@ -72,10 +73,13 @@ exports.searchFood = function(req, res) {
     }
 		var results = parseResults(req, parsedData);
 		var resultList = results[0];
-		var venueIds = results[1]; // array of vId + vData
+// 		var venueIds = results[1]; // array of vId + vData
+		
+		// TESTING - only get pics for first 20
+		var venue20 = resultList.slice(0, 20);
 		
 		// makes call to getAllFood()
-		getFoodPics(venueIds, function(err, photoData){
+		getFoodPics(venue20, function(err, photoData){
 			
 			var allVenues = {
 				venuesArr: resultList,

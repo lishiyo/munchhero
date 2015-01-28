@@ -11,11 +11,11 @@ var setUpMap = function(){
 
 	var showPosition = function(position) {
 		var theLatLng = new google.maps.LatLng(Number(position.coords.latitude), Number(position.coords.longitude)); 
-		console.log("showposition", theLatLng);
+		
 
 		document.getElementById('lat').setAttribute("value", position.coords.latitude);
 		document.getElementById('lng').setAttribute("value", position.coords.longitude);
-
+		
 		var mapOptions = {
 			zoom: 15,
 			center: theLatLng
@@ -34,11 +34,6 @@ var setUpMap = function(){
 		var markers = [];
 		var latLngBounds = new google.maps.LatLngBounds();
 
-// 		lat: Number(venue.location.lat),
-// 		lng: Number(venue.location.lng),
-// 		name: venue.name,
-// 		rating: venue.rating,
-// 		price: venue.price
 		if (latLng !== undefined && latLng.length > 0) {
 			latLng.forEach(function(item){
 				infoWindows.push(new google.maps.InfoWindow({
@@ -78,8 +73,24 @@ var setUpMap = function(){
 	getLocation();
 }
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-	function($scope, Authentication) {
+angular.module('core')
+
+.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+ 
+                event.preventDefault();
+            }
+        });
+    };
+})
+
+.controller('HomeController', ['$scope', 'Authentication', '$location', 
+	function($scope, Authentication, $location) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 		
@@ -89,6 +100,21 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 			script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&' + 'callback=setUpMap';
 			document.body.appendChild(script);
 		};
-	}																									 
-	
+		
+		// http://field-neutral.codio.io:3000/#!/searchFood?query=pizza&lat=40.811597299999995&lng=-73.9589499
+		$scope.getSearch = function(){			
+			var lat = angular.element( document.querySelector( '#lat' ) ).val();
+			var lng = angular.element( document.querySelector( '#lng' ) ).val();
+			
+			var url = '/searchFood?query=' + this.query + "&lat=" + lat + "&lng=" + lng;
+			console.log("getSearch", url);
+			
+			$location.path("/searchFood").search({
+				query: this.query,
+				lat: lat,
+				lng: lng
+			});
+			
+		}
+	}																									 	
 ]);

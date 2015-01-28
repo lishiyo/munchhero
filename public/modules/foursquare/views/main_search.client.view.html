@@ -1,19 +1,24 @@
 <body ng-app="foursquare">
 	
 <section data-ng-controller="MainSearchController" data-ng-init="loadAll()">
-	<h1>Great pick!</h1>
+	<h3>yum! click for info, swipe right to like</h3>
 	
 	<section class="cards" no-scroll>
-	<ion-pane ng-controller="CardsCtrl">
-		<ion-header-bar class="bar-default">
-			<h1 class="title">TD Cards</h1>
-		</ion-header-bar>
-
+	<ion-pane ng-if="cards.length > 0">
 		<td-cards>
 			<td-card ng-repeat="card in cards" on-destroy="cardDestroyed($index)" on-swipe-left="cardSwipedLeft($index)" on-swipe-right="cardSwipedRight($index)" on-partial-swipe="cardPartialSwipe(amt)" class="card-{{$index}}">
-				<div class="image" ng-controller="CardCtrl">
+				<div class="image" data-ng-controller="CardCtrl">
 					<div class="no-text">NOPE</div>
-					<img ng-src="{{card.image}}">
+						<img ng-src="{{card.url}}" ng-click="showData(card)">
+						<div class="card-data hidden">
+							
+							{{card.vName}}
+							<br>
+							<span ng-if="card.vContact !== undefined">{{card.vContact}}  || </span>
+							<a ng-if="card.vUrl !== undefined" href="{{card.vUrl}}">site</a>
+					
+					</div>
+					
 					<div class="yes-text">LIKE</div>
 				</div>
 			</td-card>
@@ -21,12 +26,14 @@
 	</ion-pane>
 </section>
 	
-	
+	<h2>All Photos</h2>
 	<div id="photos-cont">
 		<div class="photo-box" ng-repeat="photo in photos">
 			<div class="photo-box">
 				<img src="{{ photo.url }}">
-				{{photo.vName}} {{photo.vRating}}
+				{{photo.vName}} || <a ng-if="photo.vUrl !== undefined">Site</a>
+				<br>
+				{{photo.vRating}} || {{photo.vPrice}}
 			</div>
 		</div>
 		<div class="animate-repeat" ng-if="photos.length == 0">
@@ -34,9 +41,13 @@
     </div>
 	</div>
 	
-	<input type="search" ng-model="q" placeholder="filter venues..." />
+	<h2>All Venues</h2>
+	<input type="search" ng-model="q" placeholder="filter venues..." class="searchFont" />
+	
 	<div id="venues-cont">
-		<div class="animate-repeat venue venueInfo" ng-repeat="venue in venues | filter:q">
+		<div class="animate-repeat" ng-repeat="venue in venues | filter:q" >
+		<li>
+			<div class="venue">
 			<div class="venueInfo">				
 				<div class="venueName">
 					<a ng-if="venue.url !== undefined" href="{{venue.url}}">{{venue.name}}</a>
@@ -45,8 +56,36 @@
 				<div class="address">
 					{{venue.address.join(" ")}} 
 				</div>
+				<div class="phone">
+					<span ng-if="venue.contact !== undefined">venue.contact</span>				</div>
 			</div>
-    </div>
+					<div class="totalCheckIns"> 
+					<img src="/images/checkIns.png"> 
+						<div class="count">{{venue.stats.checkinsCount}}</div>
+					</div>
+					<div class="hereNow">
+						<div><img src="/images/hereNow.png"> </div>
+						<div class="count">{{venue.checkins.count}}</div>
+					</div>
+					<div class="price">
+						{{venue.price}} <img src="/images/money.png">
+					</div>
+					<div class="open">
+						<span ng-if="venue.open == true">
+							<img src="/images/open.png">
+							<div class="count"> Open </div>
+						</span>
+						<span ng-if="venue.open == false">
+							<img src="/images/closed.png">
+							<div class="count"> Closed </div>
+						</span>						
+ 					</div>
+ 					<div class="rating"> 
+						<span ng-if="venue.rating !== undefined">{{venue.rating}}</span>	 					
+ 					</div>
+    	</div><!-- venue -->
+			</li>
+		</div>
 		
     <div class="animate-repeat" ng-if="venues.length == 0">
       <strong>No results found...</strong>
